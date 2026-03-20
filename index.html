@@ -129,50 +129,36 @@
     /* Floating cart bubble */
     #cart-bubble {
       position: fixed;
-      bottom: 80px;
+      bottom: 24px;
       left: 50%;
       transform: translateX(-50%);
       background: #f9a825;
       color: #333;
       border-radius: 50px;
-      padding: 10px 22px;
+      padding: 10px 28px;
       text-align: center;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      box-shadow: 0 4px 18px rgba(0,0,0,0.22);
       display: none;
       z-index: 50;
       min-width: 220px;
-      transition: background 0.3s, color 0.3s;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s, transform 0.15s;
     }
+    #cart-bubble:hover { transform: translateX(-50%) scale(1.04); }
+    #cart-bubble:active { transform: translateX(-50%) scale(0.97); }
     #cart-bubble.free-delivery { background: #2e7d32; color: white; }
-    #cart-bubble .bubble-amount { font-size: 1.1rem; font-weight: 700; }
-    #cart-bubble .bubble-note   { font-size: 0.75rem; margin-top: 2px; opacity: 0.85; }
+    #cart-bubble .bubble-cta    { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.75; margin-bottom: 2px; }
+    #cart-bubble .bubble-amount { font-size: 1.15rem; font-weight: 700; }
+    #cart-bubble .bubble-note   { font-size: 0.72rem; margin-top: 2px; opacity: 0.8; }
 
     /* Footer */
     .footer {
       text-align: center;
-      padding: 12px 24px 24px;
+      padding: 12px 24px 80px;
       max-width: 600px;
       margin: 0 auto;
     }
-    #selected-count { margin-bottom: 10px; font-size: 0.9rem; color: #555; }
-
-    #checkout-btn {
-      background: #25D366;
-      color: white;
-      border: none;
-      padding: 14px 36px;
-      font-size: 1rem;
-      border-radius: 50px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 4px 14px rgba(37,211,102,0.4);
-      transition: background 0.2s, transform 0.15s;
-    }
-    #checkout-btn:hover { background: #1ebe5d; transform: scale(1.03); }
-    #checkout-btn:disabled { background: #aaa; box-shadow: none; cursor: not-allowed; transform: none; }
-    #checkout-btn svg { width: 22px; height: 22px; fill: white; }
+    #selected-count { font-size: 0.9rem; color: #555; }
 
     /* Modal */
     .modal-overlay {
@@ -241,17 +227,11 @@
 
 <div class="footer">
   <p id="selected-count">0 items selected</p>
-  <button id="checkout-btn" disabled>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.855L0 24l6.335-1.508A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.213-3.76.895.952-3.653-.234-.374A9.818 9.818 0 1112 21.818z"/>
-    </svg>
-    Proceed to Order
-  </button>
 </div>
 
 <!-- Floating cart bubble -->
 <div id="cart-bubble">
+  <div class="bubble-cta">Tap to Order →</div>
   <div class="bubble-amount" id="bubble-amount">₹0</div>
   <div class="bubble-note"   id="bubble-note"></div>
 </div>
@@ -304,19 +284,21 @@
   function totalItems(){ return qty.reduce((s, q) => s + q, 0); }
 
   const grid      = document.getElementById("product-grid");
-  const btn       = document.getElementById("checkout-btn");
   const countEl   = document.getElementById("selected-count");
   const bubble    = document.getElementById("cart-bubble");
   const bubbleAmt = document.getElementById("bubble-amount");
   const bubbleNote= document.getElementById("bubble-note");
   const overlay   = document.getElementById("modal-overlay");
 
+  bubble.addEventListener("click", () => {
+    if (totalItems() > 0) overlay.classList.add("open");
+  });
+
   function updateUI() {
     const n    = totalItems();
     const sale = totalSale();
 
     countEl.textContent = `${n} item${n !== 1 ? "s" : ""} in cart`;
-    btn.disabled = n === 0;
 
     // floating bubble
     if (n === 0) {
@@ -414,8 +396,6 @@
     });
   });
 
-  btn.addEventListener("click", () => overlay.classList.add("open"));
-
   document.getElementById("modal-cancel").addEventListener("click", () => {
     overlay.classList.remove("open");
   });
@@ -436,22 +416,14 @@
     const delivery  = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
     const finalPrice= saleTotal + delivery;
 
-    const selectedRows = products
+    const itemLines = products
       .map((p, i) => ({ p, q: qty[i] }))
-      .filter(({ q }) => q > 0);
-
-    // Table-like alignment using monospace padding
-    const col1 = 28; // item name width
-    function pad(str, len) { return str.length >= len ? str.slice(0, len) : str + " ".repeat(len - str.length); }
-
-    const tableHeader = `${pad("Item", col1)} Qty  Price`;
-    const tableDivider = "-".repeat(col1 + 12);
-    const tableRows = selectedRows.map(({ p, q }) => {
-      const m = getMeasurement(p);
-      const label = p.name.slice(0, col1 - 1) + (p.name.length > col1 - 1 ? "…" : "");
-      const linePrice = p.sale * q;
-      return `${pad(label, col1)} x${String(q).padEnd(3)} ₹${linePrice}`;
-    }).join("\n");
+      .filter(({ q }) => q > 0)
+      .map(({ p, q }, idx) => {
+        const m = getMeasurement(p);
+        const linePrice = p.sale * q;
+        return `${idx + 1}. ${p.name}${m ? ", " + m : ""}${q > 1 ? " x" + q : ""} : ₹${linePrice}`;
+      }).join("\n");
 
     const deliveryLine = delivery === 0 ? `Delivery fees : Free` : `Delivery fees : ₹${delivery}`;
 
