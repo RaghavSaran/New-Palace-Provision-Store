@@ -448,7 +448,7 @@ Your phone number: *${phone}*
 
 The store will review the order and if accepted, will soon share a QR code for the UPI Payment. Thanks!`;
 
-    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`, "_blank");
+    window.location.href = `https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`;
   }
 
   updateUI();
