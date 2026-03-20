@@ -436,14 +436,22 @@
     const delivery  = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
     const finalPrice= saleTotal + delivery;
 
-    const itemLines = products
+    const selectedRows = products
       .map((p, i) => ({ p, q: qty[i] }))
-      .filter(({ q }) => q > 0)
-      .map(({ p, q }, idx) => {
-        const m = getMeasurement(p);
-        const linePrice = p.sale * q;
-        return `${idx + 1}. ${p.name}${m ? ", " + m : ""}${q > 1 ? " x" + q : ""} : ₹${linePrice}`;
-      }).join("\n");
+      .filter(({ q }) => q > 0);
+
+    // Table-like alignment using monospace padding
+    const col1 = 28; // item name width
+    function pad(str, len) { return str.length >= len ? str.slice(0, len) : str + " ".repeat(len - str.length); }
+
+    const tableHeader = `${pad("Item", col1)} Qty  Price`;
+    const tableDivider = "-".repeat(col1 + 12);
+    const tableRows = selectedRows.map(({ p, q }) => {
+      const m = getMeasurement(p);
+      const label = p.name.slice(0, col1 - 1) + (p.name.length > col1 - 1 ? "…" : "");
+      const linePrice = p.sale * q;
+      return `${pad(label, col1)} x${String(q).padEnd(3)} ₹${linePrice}`;
+    }).join("\n");
 
     const deliveryLine = delivery === 0 ? `Delivery fees : Free` : `Delivery fees : ₹${delivery}`;
 
@@ -452,16 +460,19 @@
 
 Items added by you:
 
-${itemLines}
+${tableHeader}
+${tableDivider}
+${tableRows}
+${tableDivider}
 
 MRP price : ₹${mrpTotal}
-Discounts : -₹${discount}
+Discounts on MRP : -₹${discount}
 ${deliveryLine}
 
-Final price : ₹${finalPrice}
+*Final price : ₹${finalPrice}*
 
-Your address: ${address}
-Your phone number: ${phone}
+Your address: *${address}*
+Your phone number: *${phone}*
 
 The store will review the order and if accepted, will soon share a QR code for the UPI Payment. Thanks!`;
 
