@@ -11,23 +11,26 @@
       font-family: 'Segoe UI', sans-serif;
       background: #f5f5f0;
       color: #333;
+      padding-bottom: 100px;
     }
 
     header {
       background: #2e7d32;
       color: white;
-      padding: 20px;
+      padding: 16px 20px;
       text-align: center;
     }
-    header h1 { font-size: 1.6rem; }
-    header p { font-size: 0.9rem; opacity: 0.85; margin-top: 4px; }
+    header h1 { font-size: 1.4rem; }
+    header p  { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+    header .store-phone { font-size: 0.9rem; margin-top: 6px; opacity: 1; font-weight: 600; letter-spacing: 0.5px; }
 
+    /* 2-column portrait grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 16px;
-      padding: 24px;
-      max-width: 960px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 16px;
+      max-width: 600px;
       margin: 0 auto;
     }
 
@@ -39,6 +42,8 @@
       transition: transform 0.15s, box-shadow 0.15s;
       cursor: pointer;
       user-select: none;
+      display: flex;
+      flex-direction: column;
     }
     .card:hover { transform: translateY(-3px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
     .card:active { transform: scale(0.97); }
@@ -46,82 +51,111 @@
 
     .card img {
       width: 100%;
-      height: 140px;
+      height: 160px;
       object-fit: cover;
     }
 
-    .card-body { padding: 10px 12px 14px; }
-    .card-body h3 { font-size: 0.82rem; margin-bottom: 5px; line-height: 1.3; }
-
-    .measurement {
-      font-size: 0.75rem;
-      color: #888;
-      margin-bottom: 6px;
+    .card-body {
+      padding: 10px 10px 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
+    .card-body h3 { font-size: 0.8rem; margin-bottom: 4px; line-height: 1.3; }
+
+    .measurement { font-size: 0.72rem; color: #888; margin-bottom: 6px; }
 
     .pricing {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
-    .mrp-strike {
-      font-size: 0.78rem;
-      color: #aaa;
-      text-decoration: line-through;
-    }
-    .sale-price {
-      font-size: 0.92rem;
-      color: #2e7d32;
-      font-weight: 700;
-    }
+    .mrp-strike { font-size: 0.75rem; color: #aaa; text-decoration: line-through; }
+    .sale-price  { font-size: 0.9rem; color: #2e7d32; font-weight: 700; }
 
-    .card-body label {
+    /* Checkbox row */
+    .add-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.82rem;
-      cursor: pointer;
+      font-size: 0.8rem;
+      margin-top: auto;
     }
-    .card-body input[type="checkbox"] {
-      width: 17px; height: 17px;
+    .add-row input[type="checkbox"] {
+      width: 16px; height: 16px;
       accent-color: #2e7d32;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
-    /* Delivery banner */
-    #delivery-banner {
-      max-width: 960px;
-      margin: 0 auto 4px;
-      padding: 0 24px;
-    }
-    #delivery-msg {
-      background: #fff8e1;
-      border-left: 4px solid #f9a825;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.9rem;
-      color: #555;
+    /* Quantity stepper — hidden until checked */
+    .qty-stepper {
       display: none;
+      align-items: center;
+      gap: 0;
+      margin-top: 8px;
+      border: 1.5px solid #2e7d32;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
     }
-    #delivery-msg.free {
-      background: #e8f5e9;
-      border-color: #2e7d32;
+    .qty-stepper.visible { display: flex; }
+
+    .qty-btn {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      width: 34px;
+      height: 32px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .qty-btn:hover { background: #1b5e20; }
+    .qty-num {
+      flex: 1;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
       color: #2e7d32;
-      font-weight: 600;
     }
+
+    /* Floating cart bubble */
+    #cart-bubble {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f9a825;
+      color: #333;
+      border-radius: 50px;
+      padding: 10px 22px;
+      text-align: center;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      display: none;
+      z-index: 50;
+      min-width: 220px;
+      transition: background 0.3s, color 0.3s;
+    }
+    #cart-bubble.free-delivery { background: #2e7d32; color: white; }
+    #cart-bubble .bubble-amount { font-size: 1.1rem; font-weight: 700; }
+    #cart-bubble .bubble-note   { font-size: 0.75rem; margin-top: 2px; opacity: 0.85; }
 
     /* Footer */
     .footer {
       text-align: center;
-      padding: 16px 24px 40px;
+      padding: 12px 24px 24px;
+      max-width: 600px;
+      margin: 0 auto;
     }
-    #selected-count {
-      margin-bottom: 10px;
-      font-size: 0.95rem;
-      color: #555;
-    }
+    #selected-count { margin-bottom: 10px; font-size: 0.9rem; color: #555; }
+
     #checkout-btn {
       background: #25D366;
       color: white;
@@ -160,7 +194,7 @@
       box-shadow: 0 8px 32px rgba(0,0,0,0.2);
     }
     .modal h2 { font-size: 1.1rem; margin-bottom: 6px; color: #2e7d32; }
-    .modal p { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
+    .modal p  { font-size: 0.85rem; color: #777; margin-bottom: 20px; }
 
     .modal label {
       display: block;
@@ -200,11 +234,10 @@
 <header>
   <h1>🛒 New Palace Provision & General Store</h1>
   <p>Sector 30C, Chandigarh — Order via WhatsApp</p>
+  <p class="store-phone">📞 9876364002</p>
 </header>
 
 <div class="grid" id="product-grid"></div>
-
-<div id="delivery-banner"><div id="delivery-msg"></div></div>
 
 <div class="footer">
   <p id="selected-count">0 items selected</p>
@@ -215,6 +248,12 @@
     </svg>
     Proceed to Order
   </button>
+</div>
+
+<!-- Floating cart bubble -->
+<div id="cart-bubble">
+  <div class="bubble-amount" id="bubble-amount">₹0</div>
+  <div class="bubble-note"   id="bubble-note"></div>
 </div>
 
 <!-- Address / Phone Modal -->
@@ -242,141 +281,140 @@
   const DELIVERY_CHARGE = 50;
 
   const products = [
-    {
-      id: 1, ext: "avif",
-      name: "Whole Farm Grocery Makhana",
-      mrp: 210, sale: 119,
-      grams: 100
-    },
-    {
-      id: 2, ext: "png",
-      name: "Oral-B Cavity Defense Bacterial Fighter Toothbrush (Soft - Pack of 6)",
-      mrp: 120, sale: 111,
-      pcs: 6
-    },
-    {
-      id: 3, ext: "avif",
-      name: "Mamaearth Vitamin C Face Wash",
-      mrp: 125, sale: 125,
-      ml: 50
-    },
-    {
-      id: 4, ext: "png",
-      name: "Pril Tamarind Shine Specialist Dishwash Gel",
-      mrp: 225, sale: 198,
-      ml: 750
-    },
-    {
-      id: 5, ext: "png",
-      name: "Nestle KitKat 4F Choco Wafer Chocolate",
-      mrp: 30, sale: 30,
-      grams: 38.5
-    },
-    {
-      id: 6, ext: "png",
-      name: "Teddyy Pant Style Baby Diaper",
-      mrp: 949, sale: 464,
-      pcs: 74
-    },
+    { id: 1, ext: "avif", name: "Whole Farm Grocery Makhana",                                          mrp: 210, sale: 119, grams: 100 },
+    { id: 2, ext: "png",  name: "Oral-B Cavity Defense Bacterial Fighter Toothbrush (Soft - Pack of 6)", mrp: 120, sale: 111, pcs: 6 },
+    { id: 3, ext: "avif", name: "Mamaearth Vitamin C Face Wash",                                        mrp: 125, sale: 125, ml: 50 },
+    { id: 4, ext: "png",  name: "Pril Tamarind Shine Specialist Dishwash Gel",                          mrp: 225, sale: 198, ml: 750 },
+    { id: 5, ext: "png",  name: "Nestle KitKat 4F Choco Wafer Chocolate",                               mrp: 30,  sale: 30,  grams: 38.5 },
+    { id: 6, ext: "png",  name: "Teddyy Pant Style Baby Diaper",                                        mrp: 949, sale: 464, pcs: 74 },
   ];
 
-  function getMeasurementLabel(p) {
-    if (p.grams)  return `${p.grams}gm`;
-    if (p.ml)     return `${p.ml}ml`;
-    if (p.pcs)    return `${p.pcs} pcs`;
+  // qty[i] = quantity selected for product i (0 = not in cart)
+  const qty = new Array(products.length).fill(0);
+
+  function getMeasurement(p) {
+    if (p.grams) return `${p.grams}gm`;
+    if (p.ml)    return `${p.ml}ml`;
+    if (p.pcs)   return `${p.pcs} pcs`;
     return "";
   }
 
-  function getMeasurementText(p) {
-    if (p.grams)  return `${p.grams}gm`;
-    if (p.ml)     return `${p.ml}ml`;
-    if (p.pcs)    return `${p.pcs} pcs`;
-    return "";
-  }
+  function totalSale() { return products.reduce((s, p, i) => s + p.sale * qty[i], 0); }
+  function totalMRP()  { return products.reduce((s, p, i) => s + p.mrp  * qty[i], 0); }
+  function totalItems(){ return qty.reduce((s, q) => s + q, 0); }
 
-  const grid     = document.getElementById("product-grid");
-  const btn      = document.getElementById("checkout-btn");
-  const countEl  = document.getElementById("selected-count");
-  const delivMsg = document.getElementById("delivery-msg");
-  const overlay  = document.getElementById("modal-overlay");
-
-  const checked = new Set();
-
-  function totalSale() {
-    return [...checked].reduce((s, i) => s + products[i].sale, 0);
-  }
-  function totalMRP() {
-    return [...checked].reduce((s, i) => s + products[i].mrp, 0);
-  }
+  const grid      = document.getElementById("product-grid");
+  const btn       = document.getElementById("checkout-btn");
+  const countEl   = document.getElementById("selected-count");
+  const bubble    = document.getElementById("cart-bubble");
+  const bubbleAmt = document.getElementById("bubble-amount");
+  const bubbleNote= document.getElementById("bubble-note");
+  const overlay   = document.getElementById("modal-overlay");
 
   function updateUI() {
-    const n = checked.size;
-    countEl.textContent = `${n} item${n !== 1 ? "s" : ""} selected`;
+    const n    = totalItems();
+    const sale = totalSale();
+
+    countEl.textContent = `${n} item${n !== 1 ? "s" : ""} in cart`;
     btn.disabled = n === 0;
 
+    // floating bubble
     if (n === 0) {
-      delivMsg.style.display = "none";
-      return;
-    }
-
-    const sale = totalSale();
-    delivMsg.style.display = "block";
-
-    if (sale >= FREE_DELIVERY_THRESHOLD) {
-      delivMsg.className = "free";
-      delivMsg.textContent = "Thanks for adding the items. You earned free delivery! Hurray! 🎉";
+      bubble.style.display = "none";
     } else {
-      delivMsg.className = "";
-      const diff = FREE_DELIVERY_THRESHOLD - sale;
-      delivMsg.textContent =
-        `Thanks for adding the items. Please add items worth ₹${diff} more to get free delivery, otherwise ₹${DELIVERY_CHARGE} will be charged.`;
+      bubble.style.display = "block";
+      bubbleAmt.textContent = `₹${sale}`;
+      if (sale >= FREE_DELIVERY_THRESHOLD) {
+        bubble.classList.add("free-delivery");
+        bubbleNote.textContent = "Free delivery >₹500 !!!";
+      } else {
+        bubble.classList.remove("free-delivery");
+        bubbleNote.textContent = `+ delivery charges (below ₹500)`;
+      }
     }
   }
 
+  // Build cards
   products.forEach((p, i) => {
-    const imgSrc = `Item images/${p.id}.${p.ext}`;
-    const measurement = getMeasurementLabel(p);
     const hasSale = p.sale < p.mrp;
+    const m = getMeasurement(p);
 
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <img src="${imgSrc}" alt="${p.name}" loading="lazy" />
+      <img src="Item images/${p.id}.${p.ext}" alt="${p.name}" loading="lazy" />
       <div class="card-body">
         <h3>${p.name}</h3>
-        ${measurement ? `<div class="measurement">${measurement}</div>` : ""}
+        ${m ? `<div class="measurement">${m}</div>` : ""}
         <div class="pricing">
           ${hasSale ? `<span class="mrp-strike">₹${p.mrp}</span>` : ""}
           <span class="sale-price">₹${p.sale}</span>
         </div>
-        <label>
-          <input type="checkbox" data-index="${i}" />
-          Add to order
-        </label>
+        <div class="add-row">
+          <input type="checkbox" id="cb-${i}" />
+          <label for="cb-${i}" style="cursor:pointer;font-size:0.8rem;">Add to order</label>
+        </div>
+        <div class="qty-stepper" id="stepper-${i}">
+          <button class="qty-btn" id="minus-${i}">−</button>
+          <span class="qty-num" id="qnum-${i}">1</span>
+          <button class="qty-btn" id="plus-${i}">+</button>
+        </div>
       </div>
     `;
 
-    const cb = card.querySelector("input");
+    grid.appendChild(card);
+
+    const cb      = document.getElementById(`cb-${i}`);
+    const stepper = document.getElementById(`stepper-${i}`);
+    const qnum    = document.getElementById(`qnum-${i}`);
+    const minusBtn= document.getElementById(`minus-${i}`);
+    const plusBtn = document.getElementById(`plus-${i}`);
 
     cb.addEventListener("change", () => {
-      if (cb.checked) { checked.add(i); card.classList.add("selected"); }
-      else            { checked.delete(i); card.classList.remove("selected"); }
+      if (cb.checked) {
+        qty[i] = 1;
+        qnum.textContent = 1;
+        stepper.classList.add("visible");
+        card.classList.add("selected");
+      } else {
+        qty[i] = 0;
+        stepper.classList.remove("visible");
+        card.classList.remove("selected");
+      }
       updateUI();
     });
 
+    plusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      qty[i]++;
+      qnum.textContent = qty[i];
+      updateUI();
+    });
+
+    minusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (qty[i] > 1) {
+        qty[i]--;
+        qnum.textContent = qty[i];
+      } else {
+        // deselect
+        qty[i] = 0;
+        cb.checked = false;
+        stepper.classList.remove("visible");
+        card.classList.remove("selected");
+      }
+      updateUI();
+    });
+
+    // card click toggles checkbox (but not on stepper buttons)
     card.addEventListener("click", (e) => {
-      if (e.target === cb) return;
+      if (e.target === cb || e.target.closest(".qty-stepper") || e.target.tagName === "LABEL") return;
       cb.checked = !cb.checked;
       cb.dispatchEvent(new Event("change"));
     });
-
-    grid.appendChild(card);
   });
 
-  // Open modal on checkout click
-  btn.addEventListener("click", () => {
-    overlay.classList.add("open");
-  });
+  btn.addEventListener("click", () => overlay.classList.add("open"));
 
   document.getElementById("modal-cancel").addEventListener("click", () => {
     overlay.classList.remove("open");
@@ -385,30 +423,29 @@
   document.getElementById("modal-confirm").addEventListener("click", () => {
     const address = document.getElementById("input-address").value.trim();
     const phone   = document.getElementById("input-phone").value.trim();
-
     if (!address) { alert("Please enter your delivery address."); return; }
     if (!phone)   { alert("Please enter your phone number."); return; }
-
     overlay.classList.remove("open");
     sendWhatsApp(address, phone);
   });
 
   function sendWhatsApp(address, phone) {
-    const selectedItems = [...checked].map(i => products[i]);
-    const mrpTotal      = totalMRP();
-    const saleTotal     = totalSale();
-    const discount      = mrpTotal - saleTotal;
-    const delivery      = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
-    const finalPrice    = saleTotal + delivery;
+    const mrpTotal  = totalMRP();
+    const saleTotal = totalSale();
+    const discount  = mrpTotal - saleTotal;
+    const delivery  = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
+    const finalPrice= saleTotal + delivery;
 
-    const itemLines = selectedItems.map((p, idx) => {
-      const m = getMeasurementText(p);
-      return `${idx + 1}. ${p.name}${m ? ", " + m : ""} : ₹${p.sale}`;
-    }).join("\n");
+    const itemLines = products
+      .map((p, i) => ({ p, q: qty[i] }))
+      .filter(({ q }) => q > 0)
+      .map(({ p, q }, idx) => {
+        const m = getMeasurement(p);
+        const linePrice = p.sale * q;
+        return `${idx + 1}. ${p.name}${m ? ", " + m : ""}${q > 1 ? " x" + q : ""} : ₹${linePrice}`;
+      }).join("\n");
 
-    const deliveryLine = delivery === 0
-      ? `Delivery fees : Free`
-      : `Delivery fees : ₹${delivery}`;
+    const deliveryLine = delivery === 0 ? `Delivery fees : Free` : `Delivery fees : ₹${delivery}`;
 
     const message =
 `Thanks for ordering from New Palace Provision Store, Sector 30C, Chandigarh!!
@@ -418,18 +455,17 @@ Items added by you:
 ${itemLines}
 
 MRP price : ₹${mrpTotal}
-Discounts on MRP : -₹${discount}
+Discounts : -₹${discount}
 ${deliveryLine}
 
-*Final price : ₹${finalPrice}*
+Final price : ₹${finalPrice}
 
-Your address: *${address}*
-Your phone number: *${phone}*
+Your address: ${address}
+Your phone number: ${phone}
 
 The store will review the order and if accepted, will soon share a QR code for the UPI Payment. Thanks!`;
 
-    const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`, "_blank");
   }
 
   updateUI();
