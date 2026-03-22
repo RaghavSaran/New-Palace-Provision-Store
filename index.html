@@ -240,7 +240,10 @@
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <h2>Delivery Details</h2>
-    <p>We need your address and phone number so our delivery boy can reach you.</p>
+    <p>We need your details so our delivery boy can reach you.</p>
+
+    <label for="input-name">Your Name</label>
+    <input type="text" id="input-name" placeholder="e.g. Mohit" />
 
     <label for="input-address">Delivery Address</label>
     <textarea id="input-address" placeholder="House no., Street, Sector, City"></textarea>
@@ -260,14 +263,39 @@
   const FREE_DELIVERY_THRESHOLD = 500;
   const DELIVERY_CHARGE = 50;
 
-  const products = [
-    { id: 1, ext: "avif", name: "Whole Farm Grocery Makhana",                                          mrp: 210, sale: 119, grams: 100 },
-    { id: 2, ext: "png",  name: "Oral-B Cavity Defense Bacterial Fighter Toothbrush (Soft - Pack of 6)", mrp: 120, sale: 111, pcs: 6 },
-    { id: 3, ext: "avif", name: "Mamaearth Vitamin C Face Wash",                                        mrp: 125, sale: 125, ml: 50 },
-    { id: 4, ext: "png",  name: "Pril Tamarind Shine Specialist Dishwash Gel",                          mrp: 225, sale: 198, ml: 750 },
-    { id: 5, ext: "png",  name: "Nestle KitKat 4F Choco Wafer Chocolate",                               mrp: 30,  sale: 30,  grams: 38.5 },
-    { id: 6, ext: "png",  name: "Teddyy Pant Style Baby Diaper",                                        mrp: 949, sale: 464, pcs: 74 },
-  ];
+  // Image extension map — add entries if you add new items
+  const IMG_EXT = { 1:"avif", 2:"png", 3:"avif", 4:"png", 5:"png", 6:"png" };
+
+  function parseCSV(text) {
+    const lines = text.split("\n").map(l => l.trim()).filter(l => l);
+    // skip header row, skip empty/junk rows (first col must be a number)
+    return lines.slice(1)
+      .map(line => {
+        const cols = line.split(",");
+        const id = parseInt(cols[0]);
+        if (isNaN(id)) return null;
+        const name  = (cols[1] || "").trim();
+        const mrp   = parseFloat(cols[2]) || 0;
+        const sale  = parseFloat(cols[3]) || mrp;
+        const grams = parseFloat(cols[4]) || 0;
+        const ml    = parseFloat(cols[5]) || 0;
+        const pcs   = parseFloat(cols[6]) || 0;
+        const ext   = IMG_EXT[id] || "png";
+        return { id, name, mrp, sale,
+          ...(grams ? { grams } : {}),
+          ...(ml    ? { ml }    : {}),
+          ...(pcs   ? { pcs }   : {}),
+          ext };
+      })
+      .filter(p => p && p.name);
+  }
+
+  fetch("Items list.csv")
+    .then(r => r.text())
+    .then(text => initApp(parseCSV(text)))
+    .catch(() => { document.getElementById("product-grid").innerHTML = "<p style='padding:24px;color:red'>Could not load items. Make sure Items list.csv is in the same folder.</p>"; });
+
+  function initApp(products) {
 
   // qty[i] = quantity selected for product i (0 = not in cart)
   const qty = new Array(products.length).fill(0);
@@ -401,54 +429,72 @@
   });
 
   document.getElementById("modal-confirm").addEventListener("click", () => {
+    const name    = document.getElementById("input-name").value.trim();
     const address = document.getElementById("input-address").value.trim();
     const phone   = document.getElementById("input-phone").value.trim();
+    if (!name)    { alert("Please enter your name."); return; }
     if (!address) { alert("Please enter your delivery address."); return; }
     if (!phone)   { alert("Please enter your phone number."); return; }
+
+    // save for next time
+    localStorage.setItem("npp_name",    name);
+    localStorage.setItem("npp_address", address);
+    localStorage.setItem("npp_phone",   phone);
+
     overlay.classList.remove("open");
-    sendWhatsApp(address, phone);
+    sendWhatsApp(name, address, phone);
   });
 
-  function sendWhatsApp(address, phone) {
-    const mrpTotal  = totalMRP();
-    const saleTotal = totalSale();
-    const discount  = mrpTotal - saleTotal;
-    const delivery  = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
-    const finalPrice= saleTotal + delivery;
+  // prefill from localStorage if available
+  document.getElementById("input-name").value    = localStorage.getItem("npp_name")    || "";
+  document.getElementById("input-address").value = localStorage.getItem("npp_address") || "";
+  document.getElementById("input-phone").value   = localStorage.getItem("npp_phone")   || "";
+
+  function sendWhatsApp(name, address, phone) {
+    const mrpTotal   = totalMRP();
+    const saleTotal  = totalSale();
+    const saved      = mrpTotal - saleTotal;
+    const delivery   = saleTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_CHARGE;
+    const finalPrice = saleTotal + delivery;
 
     const itemLines = products
       .map((p, i) => ({ p, q: qty[i] }))
       .filter(({ q }) => q > 0)
       .map(({ p, q }, idx) => {
-        const m = getMeasurement(p);
         const linePrice = p.sale * q;
-        return `${idx + 1}. ${p.name}${m ? ", " + m : ""}${q > 1 ? " x" + q : ""} : ₹${linePrice}`;
-      }).join("\n");
+        // name encoded, then literal "%0A%20%20%20Qty: qty | ₹price"
+        return encodeURIComponent(`${idx + 1}. ${p.name}`)
+          + "%0A%20%20%20Qty:%20" + q + "%20%7C%20%E2%82%B9" + linePrice;
+      }).join("%0A%0A");
 
-    const deliveryLine = delivery === 0 ? `Delivery fees : Free` : `Delivery fees : ₹${delivery}`;
+    const deliveryLine = delivery === 0
+      ? "Delivery%20Fee:%20Free%20%20"
+      : "Delivery%20Fee:%20%E2%82%B9" + delivery + "%20%20";
 
-    const message =
-`Thanks for ordering from New Palace Provision Store, Sector 30C, Chandigarh!!
+    const url = "https://wa.me/" + PHONE + "?text="
+      + "*New%20Palace%20Provision%20Store*%0A"
+      + "Sector%2030C%2C%20Chandigarh%0A%0A"
+      + "%E2%9C%85%20*Order%20received!*%0A%0A"
+      + "%F0%9F%9B%92%20*Order%20Summary*%0A%0A"
+      + itemLines
+      + "%0A%0A------------------------%0A"
+      + "MRP%20Total:%20%E2%82%B9" + mrpTotal + "%20%20%0A"
+      + "You%20saved:%20-%E2%82%B9" + saved + "%20%20%0A"
+      + deliveryLine + "%0A%0A"
+      + "%F0%9F%92%B0%20*Final%20Amount:%20%E2%82%B9" + finalPrice + "*%0A%0A"
+      + "%F0%9F%91%A4%20*Customer%20Details*%0A"
+      + "Name:%20" + encodeURIComponent(name) + "%20%20%0A"
+      + "Address:%20" + encodeURIComponent(address) + "%20%20%0A"
+      + "Phone:%20" + encodeURIComponent(phone) + "%20%20%0A%0A"
+      + "------------------------%0A%0A"
+      + "We%E2%80%99ll%20review%20your%20order%20shortly%20and%20share%20a%20UPI%20payment%20QR.%0A%0A"
+      + "%F0%9F%9A%9A%20We%20try%20our%20best%20to%20deliver%20on%20the%20same%20day.";
 
-Items added by you:
-
-${itemLines}
-
-Total MRP : ₹${mrpTotal}
-Discounts on MRP : -₹${discount}
-${deliveryLine}
-
-*Final total : ₹${finalPrice}*
-
-Your address: *${address}*
-Your phone number: *${phone}*
-
-The store will review the order and if accepted, will soon share a QR code for the UPI Payment. Thanks!`;
-
-    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`, "_blank");
+    window.open(url, "_blank");
   }
 
   updateUI();
+  } // end initApp
 </script>
 </body>
 </html>
