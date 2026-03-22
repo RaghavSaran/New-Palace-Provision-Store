@@ -467,25 +467,25 @@ function sendWhatsApp(name, address, phone) {
 
     const deliveryLine = delivery === 0
       ? `Delivery Fee: Free  `
-      : `Delivery Fee: \u20B9${delivery}  `;
+      : `Delivery Fee: \u{20B9}${delivery}  `;
 
     const message = 
         `*New Palace Provision Store*\nSector 30C, Chandigarh\n\n`
-      + `\u2705 *Order received!*\n\n`
-      + `\uD83D\uDED2 *Order Summary*\n\n`
+      + `\u{2705} *Order received!*\n\n`
+      + `\u{1F6D2} *Order Summary*\n\n`
       + itemLines
       + `\n\n------------------------\n`
-      + `MRP Total: \u20B9${mrpTotal}  \n`
-      + `You saved: -\u20B9${saved}  \n`
+      + `MRP Total: \u{20B9}${mrpTotal}  \n`
+      + `You saved: -\u{20B9}${saved}  \n`
       + deliveryLine + `\n\n`
-      + `\uD83D\uDCB0 *Final Amount: \u20B9${finalPrice}*\n\n`
-      + `\uD83D\uDC64 *Customer Details*\n`
+      + `\u{1F4B0} *Final Amount: \u{20B9}${finalPrice}*\n\n`
+      + `\u{1F464} *Customer Details*\n`
       + `Name: ${name}  \n`
       + `Address: ${address}  \n`
       + `Phone: ${phone}  \n\n`
       + `------------------------\n\n`
-      + `We\u2019ll review your order shortly and share a UPI payment QR.\n\n`
-      + `\uD83D\uDE9A We try our best to deliver on the same day.`;
+      + `We\u{2019}ll review your order shortly and share a UPI payment QR.\n\n`
+      + `\u{1F69A} We try our best to deliver on the same day.`;
 
     const url = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(message);
     console.log(url);
