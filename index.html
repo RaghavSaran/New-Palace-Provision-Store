@@ -450,7 +450,7 @@
   document.getElementById("input-address").value = localStorage.getItem("npp_address") || "";
   document.getElementById("input-phone").value   = localStorage.getItem("npp_phone")   || "";
 
-  function sendWhatsApp(name, address, phone) {
+function sendWhatsApp(name, address, phone) {
     const mrpTotal   = totalMRP();
     const saleTotal  = totalSale();
     const saved      = mrpTotal - saleTotal;
@@ -462,36 +462,34 @@
       .filter(({ q }) => q > 0)
       .map(({ p, q }, idx) => {
         const linePrice = p.sale * q;
-        // name encoded, then literal "%0A%20%20%20Qty: qty | ₹price"
-        return encodeURIComponent(`${idx + 1}. ${p.name}`)
-          + "%0A%20%20%20Qty:%20" + q + "%20%7C%20%E2%82%B9" + linePrice;
-      }).join("%0A%0A");
+        return `${idx + 1}. ${p.name}\n   Qty: ${q} | ₹${linePrice}`;
+      }).join("\n\n");
 
     const deliveryLine = delivery === 0
-      ? "Delivery%20Fee:%20Free%20%20"
-      : "Delivery%20Fee:%20%E2%82%B9" + delivery + "%20%20";
+      ? "Delivery Fee: Free  "
+      : `Delivery Fee: ₹${delivery}  `;
 
-    const url = "https://wa.me/" + PHONE + "?text="
-      + "*New%20Palace%20Provision%20Store*%0A"
-      + "Sector%2030C%2C%20Chandigarh%0A%0A"
-      + "%E2%9C%85%20*Order%20received!*%0A%0A"
-      + "%F0%9F%9B%92%20*Order%20Summary*%0A%0A"
+    const message = 
+        `*New Palace Provision Store*\nSector 30C, Chandigarh\n\n`
+      + `✅ *Order received!*\n\n`
+      + `🛒 *Order Summary*\n\n`
       + itemLines
-      + "%0A%0A------------------------%0A"
-      + "MRP%20Total:%20%E2%82%B9" + mrpTotal + "%20%20%0A"
-      + "You%20saved:%20-%E2%82%B9" + saved + "%20%20%0A"
-      + deliveryLine + "%0A%0A"
-      + "%F0%9F%92%B0%20*Final%20Amount:%20%E2%82%B9" + finalPrice + "*%0A%0A"
-      + "%F0%9F%91%A4%20*Customer%20Details*%0A"
-      + "Name:%20" + encodeURIComponent(name) + "%20%20%0A"
-      + "Address:%20" + encodeURIComponent(address) + "%20%20%0A"
-      + "Phone:%20" + encodeURIComponent(phone) + "%20%20%0A%0A"
-      + "------------------------%0A%0A"
-      + "We%E2%80%99ll%20review%20your%20order%20shortly%20and%20share%20a%20UPI%20payment%20QR.%0A%0A"
-      + "%F0%9F%9A%9A%20We%20try%20our%20best%20to%20deliver%20on%20the%20same%20day.";
+      + `\n\n------------------------\n`
+      + `MRP Total: ₹${mrpTotal}  \n`
+      + `You saved: -₹${saved}  \n`
+      + deliveryLine + `\n\n`
+      + `💰 *Final Amount: ₹${finalPrice}*\n\n`
+      + `👤 *Customer Details*\n`
+      + `Name: ${name}  \n`
+      + `Address: ${address}  \n`
+      + `Phone: ${phone}  \n\n`
+      + `------------------------\n\n`
+      + `We'll review your order shortly and share a UPI payment QR.\n\n`
+      + `🚚 We try our best to deliver on the same day.`;
 
+    const url = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(message);
     window.open(url, "_blank");
-  }
+}
 
   updateUI();
   } // end initApp
