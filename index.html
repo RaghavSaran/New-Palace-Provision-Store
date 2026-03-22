@@ -488,6 +488,7 @@ function sendWhatsApp(name, address, phone) {
       + `\uD83D\uDE9A We try our best to deliver on the same day.`;
 
     const url = "https://wa.me/" + PHONE + "?text=" + encodeURIComponent(message);
+    console.log(url);
     window.location.href = url;
 }
 
