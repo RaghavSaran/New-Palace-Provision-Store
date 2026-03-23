@@ -301,9 +301,15 @@
   const qty = new Array(products.length).fill(0);
 
   function getMeasurement(p) {
-    if (p.grams) return `${p.grams}gm`;
-    if (p.ml)    return `${p.ml}ml`;
-    if (p.pcs)   return `${p.pcs} pcs`;
+    const hasWeight = p.grams;
+    const hasVol    = p.ml;
+    const hasPcs    = p.pcs;
+
+    if (hasWeight && hasPcs) return `${p.grams}gms / ${p.pcs} pcs`;
+    if (hasVol    && hasPcs) return `${p.ml}ml / ${p.pcs} pcs`;
+    if (hasWeight)           return `${p.grams}gms`;
+    if (hasVol)              return `${p.ml}ml`;
+    if (hasPcs)              return `${p.pcs} pcs`;
     return "";
   }
 
@@ -462,7 +468,9 @@ function sendWhatsApp(name, address, phone) {
       .filter(({ q }) => q > 0)
       .map(({ p, q }, idx) => {
         const linePrice = p.sale * q;
-        return `${idx + 1}. ${p.name}\n   Qty: ${q} | ₹${linePrice}`;
+        const m = getMeasurement(p);
+        const nameWithMeasure = m ? `${p.name}, ${m}` : p.name;
+        return `${idx + 1}. ${nameWithMeasure}\n   Qty: ${q} | ₹${linePrice}`;
       }).join("\n\n");
 
     const deliveryLine = delivery === 0
