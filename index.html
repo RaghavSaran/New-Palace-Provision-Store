@@ -462,7 +462,8 @@ function sendWhatsApp(name, address, phone) {
       .filter(({ q }) => q > 0)
       .map(({ p, q }, idx) => {
         const linePrice = p.sale * q;
-        return `${idx + 1}. ${p.name}\n   Qty: ${q} | ₹${linePrice}`;
+        const num = `${idx + 1}. `;
+        return `${num}${p.name}\n${' '.repeat(num.length)}Qty: ${q} | ₹${linePrice}`;
       }).join("\n\n");
 
     const deliveryLine = delivery === 0
