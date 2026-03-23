@@ -461,10 +461,13 @@ function sendWhatsApp(name, address, phone) {
       .map((p, i) => ({ p, q: qty[i] }))
       .filter(({ q }) => q > 0)
       .map(({ p, q }, idx) => {
-        const linePrice = p.sale * q;
-        const num = `${idx + 1}. `;
-        return `${num}${p.name}\n${' '.repeat(num.length)}Qty: ${q} | ₹${linePrice}`;
-      }).join("\n\n");
+      const linePrice = p.sale * q;
+      const numStr    = `${idx + 1}.`;
+      const numPadded = numStr.padStart(4);           // " 1."  " 9."  "10."  "99."
+      const indent    = ' '.repeat(4);                // always 4 spaces under the dot
+
+      return `${numPadded} ${p.name}\n${indent}Qty: ${q} | ₹${linePrice}`;
+    }).join("\n\n");
 
     const deliveryLine = delivery === 0
       ? `Delivery Fee: Free  `
